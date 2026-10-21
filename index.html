@@ -2,848 +2,618 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Món Quà Tình Yêu - Dành Tặng Người Tôi Yêu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Ngày Phụ Nữ Việt Nam 20/10</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Tailwind CSS for Quick Utility Styling & Reset -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
         :root {
-            --primary-pink: #ff758c;
-            --deep-red: #ff7eb3;
-            --velvet-red: #d63447;
-            --soft-white: #fff5f6;
-            --gold-accent: #f7d070;
-            --font-serif: 'Dancing Script', cursive;
-            --font-sans: 'Montserrat', sans-serif;
+            --primary-rose: #c9184a;
+            --dark-rose: #800f2f;
+            --light-pink: #ffccd5;
+            --bg-pink: #fff0f3;
+            --gold-accent: #d4af37;
+            --rose-gradient: linear-gradient(135deg, #ff4d6d, #c9184a, #800f2f);
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: var(--font-sans);
-            background: linear-gradient(135deg, #2b1055, #7597de);
-            color: #fff;
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 50%, #ffb3c1 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        #bgCanvas {
+        .font-serif-custom {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .font-cursive {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Canvas Background for Petals */
+        #petalCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            pointer-events: none;
             z-index: 1;
-            pointer-events: none;
         }
 
-        .app-container {
+        /* Glowing Button Effects */
+        .btn-glow {
+            background: var(--rose-gradient);
+            box-shadow: 0 0 15px rgba(201, 24, 74, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
+            overflow: hidden;
         }
 
-        .screen {
+        .btn-glow::before {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 1s ease, visibility 1s ease;
-        }
-
-        .screen.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* MUSIC PLAYER */
-        .music-player {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            padding: 8px 16px 8px 8px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            transform: rotate(45deg) translateY(-100%);
+            transition: transform 0.6s ease;
         }
 
-        .music-disc {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #111, #333);
-            border: 2px solid var(--gold-accent);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: rotateDisc 4s linear infinite;
-            animation-play-state: paused;
+        .btn-glow:hover::before {
+            transform: rotate(45deg) translateY(100%);
         }
 
-        .music-disc.playing {
-            animation-play-state: running;
+        .btn-glow:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(201, 24, 74, 0.5);
         }
 
-        .music-disc i {
-            color: var(--gold-accent);
-            font-size: 16px;
+        .btn-glow:active {
+            transform: translateY(1px) scale(0.98);
         }
 
-        @keyframes rotateDisc {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .music-info {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-
-        /* CONFIG BUTTON */
-        .config-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .config-btn:hover {
-            transform: rotate(45deg) scale(1.1);
-        }
-
-        /* SCREEN 1: INTRO */
-        #screen1 {
-            background: linear-gradient(135deg, rgba(255, 117, 140, 0.8), rgba(255, 126, 179, 0.8));
-            text-align: center;
-        }
-
-        .intro-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            padding: 40px 30px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            max-width: 450px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-        }
-
-        .avatar-box {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            padding: 4px;
-            background: linear-gradient(45deg, var(--gold-accent), #fff);
-            box-shadow: 0 8px 20px rgba(214, 52, 71, 0.4);
-        }
-
-        .avatar-box img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .typing-text {
-            font-family: var(--font-serif);
-            font-size: 2rem;
-            color: #fff;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            line-height: 1.3;
-        }
-
-        .btn-heartbeat {
-            padding: 16px 36px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #d63447;
-            background: #fff;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: heartbeat 1.5s infinite;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-heartbeat:hover {
-            transform: scale(1.05);
-            background: #fff5f6;
-        }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.1); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.1); }
-            70% { transform: scale(1); }
-        }
-
-        /* SCREEN 2: BOUQUET */
-        #screen2 {
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
-            text-align: center;
-        }
-
-        .bouquet-wrapper {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .bouquet-svg {
-            width: 260px;
-            height: 320px;
-            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.2));
-            transition: transform 0.2s ease;
-        }
-
-        .bouquet-wrapper:active .bouquet-svg {
-            transform: scale(0.96);
-        }
-
-        .hold-instruction {
-            margin-top: 25px;
-            font-size: 1rem;
-            color: #6a1b29;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.6);
-            padding: 10px 20px;
+        /* Minimal & Clean Card Frame */
+        .card-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 35px rgba(128, 15, 47, 0.08), 0 5px 15px rgba(0, 0, 0, 0.03);
             border-radius: 20px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.8);
         }
 
-        .progress-ring-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            width: 300px;
-            height: 300px;
+        /* Subtle Avatar Border */
+        .avatar-frame {
+            position: relative;
+            padding: 3px;
+            background: linear-gradient(135deg, #e0a96d, #f8e1b4, #c59b27);
+            border-radius: 50%;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
         }
 
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.1s linear;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-            stroke-dasharray: 816;
-            stroke-dashoffset: 816;
-        }
-
-        .popup-photo {
+        /* Animation States */
+        #scatterOverlay {
             position: fixed;
-            width: 110px;
-            height: 140px;
-            background: #fff;
-            padding: 8px 8px 25px 8px;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            inset: 0;
             pointer-events: none;
-            animation: popupFloat 1.8s ease-out forwards;
             z-index: 50;
+            display: none;
         }
 
-        .popup-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        @keyframes popupFloat {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(0deg); }
-            30% { opacity: 1; transform: translate(-50%, -120px) scale(1) rotate(var(--rot)); }
-            100% { opacity: 0; transform: translate(-50%, -200px) scale(0.8) rotate(var(--rot)); }
-        }
-
-        /* SCREEN 3: MEMORIES & COUNTER */
-        #screen3 {
-            background: linear-gradient(135deg, #2b0826, #591d3e, #1a0826);
-            overflow-y: auto;
-            justify-content: flex-start;
-            padding-top: 80px;
-            padding-bottom: 40px;
-        }
-
-        .timer-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 20px 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            width: 90%;
-            max-width: 500px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            flex-shrink: 0;
-        }
-
-        .timer-title {
-            font-family: var(--font-serif);
-            font-size: 1.8rem;
-            color: var(--gold-accent);
-            margin-bottom: 12px;
-        }
-
-        .timer-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        .timer-unit {
-            background: rgba(0, 0, 0, 0.25);
-            padding: 10px 5px;
+        .mini-card-proxy {
+            position: absolute;
+            width: 110px;
+            height: 150px;
+            background: white;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            background-size: cover;
+            background-position: center;
+            opacity: 0.9;
         }
 
-        .timer-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #fff;
-            display: block;
+        @keyframes popupBounce {
+            0% {
+                opacity: 0;
+                transform: scale(0.85) translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
-        .timer-label {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 4px;
+        .animate-card-bounce {
+            animation: popupBounce 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .waterfall-container {
-            width: 90%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
         }
-
-        .memory-card {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 204, 213, 0.2);
+            border-radius: 10px;
         }
-
-        .memory-card.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .memory-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 12px;
-        }
-
-        .memory-card p {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: #fff;
-            font-weight: 300;
-        }
-
-        .memory-card .card-date {
-            font-size: 0.75rem;
-            color: var(--gold-accent);
-            margin-top: 8px;
-            text-align: right;
-            font-weight: 600;
-        }
-
-        /* MODAL */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            z-index: 200;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-body {
-            background: #2b1055;
-            border-radius: 20px;
-            padding: 25px;
-            width: 100%;
-            max-width: 450px;
-            max-height: 85vh;
-            overflow-y: auto;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .modal-body h3 {
-            font-family: var(--font-serif);
-            font-size: 1.8rem;
-            color: var(--gold-accent);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            margin-bottom: 5px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .modal-btns {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-modal {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-save { background: var(--primary-pink); color: #fff; }
-        .btn-close { background: rgba(255,255,255,0.2); color: #fff; }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(0, 0, 0, 0.85);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            z-index: 300;
-            transition: transform 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
         }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen justify-between items-center px-4 py-6 text-gray-800">
 
-    <canvas id="bgCanvas"></canvas>
-    
-    <!-- Audio ẩn phát nhạc -->
-    <audio id="bgMusic" loop></audio>
+    <!-- Petal & Sparkle Canvas Layer -->
+    <canvas id="petalCanvas"></canvas>
 
-    <div class="music-player" id="musicBtn">
-        <div class="music-disc" id="musicDisc">
-            <i class="fa-solid fa-music"></i>
-        </div>
-        <span class="music-info" id="musicStatus">Nhạc Nền</span>
-    </div>
+    <!-- Main Content Wrapper -->
+    <div class="w-full max-w-3xl mx-auto z-10 flex flex-col items-center flex-grow justify-center my-auto">
+        
+        <!-- Header Banner -->
+        <header class="text-center mb-6 sm:mb-8">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/80 border border-pink-200 text-rose-700 text-xs sm:text-sm font-semibold mb-3 backdrop-blur-md shadow-sm">
+                <i class="fa-solid fa-heart text-rose-500 text-xs"></i>
+                <span>Random</span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-bold font-serif-custom text-rose-950 tracking-tight leading-tight">
+                Tặng quà 20 - 10 <span class="block text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-pink-600 to-amber-600 font-cursive text-4xl sm:text-6xl mt-1">Các bạn nữ 11/9</span>
+            </h1>
+        </header>
 
-    <div class="config-btn" id="openConfigBtn" title="Cấu hình">
-        <i class="fa-solid fa-gear"></i>
-    </div>
+        <!-- Dynamic Greeting Card Container Area -->
+        <main class="w-full relative min-h-[380px] flex items-center justify-center">
+            
+            <!-- Scatter FX Overlay Container -->
+            <div id="scatterOverlay"></div>
 
-    <div class="app-container">
-        <!-- SCREEN 1 -->
-        <section class="screen active" id="screen1">
-            <div class="intro-card">
-                <div class="avatar-box">
-                    <img id="introAvatar" src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&auto=format&fit=crop&q=80" alt="Avatar">
+            <!-- Card Outer Wrapper -->
+            <div id="cardWrapper" class="w-full hidden">
+                <div class="card-container p-6 sm:p-8 md:p-9">
+                    <div class="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                        
+                        <!-- Left: Wish Content -->
+                        <div class="flex-1 text-center md:text-left order-2 md:order-1 flex flex-col justify-between">
+                            <div>
+                                <!-- Tag/Role Badge -->
+                                <div class="flex items-center justify-center md:justify-start gap-2 mb-2">
+                                    <span id="cardRole" class="px-2.5 py-0.5 rounded-md text-xs font-semibold tracking-wide bg-rose-50 text-rose-700 border border-rose-200/60">
+                                        abc
+                                    </span>
+                                </div>
+
+                                <!-- Recipient Name -->
+                                <h2 id="cardTitle" class="text-2xl sm:text-3xl font-bold font-serif-custom text-gray-900 mb-3 tracking-wide">
+                                    xyz
+                                </h2>
+
+                                <!-- Main Wish Title / Quote -->
+                                <p id="cardWish" class="text-base sm:text-lg font-medium text-rose-700 mb-3 leading-relaxed font-serif-custom italic">
+                                    "123
+                                </p>
+
+                                <!-- Bio / Sentimental Sentences -->
+                                <div class="custom-scroll max-h-32 overflow-y-auto pr-1">
+                                    <p id="cardDesc" class="text-sm text-gray-600 leading-relaxed font-normal">
+                                        12345
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Subtle Footnote -->
+                            <div class="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+                                <span></span>
+                                <span class="font-cursive text-base text-rose-500 font-semibold"></span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Avatar Image -->
+                        <div class="w-full md:w-4/12 flex flex-col items-center justify-center order-1 md:order-2">
+                            <div class="avatar-frame w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 relative">
+                                <img id="cardImage" src="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=600&auto=format&fit=crop" 
+                                     alt="Hình ảnh 20/10" 
+                                     class="w-full h-full object-cover rounded-full border border-white"
+                                     onerror="this.src='https://images.unsplash.com/photo-1563241527-3004b7be0ffd?q=80&w=600&auto=format&fit=crop'">
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-                <div class="typing-text" id="typingText"></div>
-                <button class="btn-heartbeat" id="startBtn">
-                    <i class="fa-solid fa-heart"></i> Mở Món Quà
+            </div>
+
+            <!-- Completion View (Shown when all cards are viewed) -->
+            <div id="completionBox" class="w-full max-w-md hidden text-center p-8 bg-white/95 backdrop-blur-md rounded-2xl border border-pink-200 shadow-xl relative z-20">
+                <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 font-serif-custom mb-2">Đã Khám Phá Hết! 🌸</h3>
+                <p class="text-gray-600 text-sm mb-6">
+                    Bạn đã khám phá trọn bộ 12 danh thiếp chúc mừng Ngày Phụ Nữ Việt Nam 20/10 với những lời chúc ý nghĩa nhất.
+                </p>
+                <button id="btnReset" class="w-full py-3 px-6 rounded-full font-semibold text-white btn-glow flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Xem Lại Từ Đầu</span>
                 </button>
             </div>
-        </section>
 
-        <!-- SCREEN 2 -->
-        <section class="screen" id="screen2">
-            <div class="bouquet-wrapper" id="bouquetContainer">
-                <svg class="bouquet-svg" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M60 160 L100 230 L140 160 Q100 180 60 160 Z" fill="#ff758c" />
-                    <path d="M50 120 Q100 150 150 120 L135 170 Q100 185 65 170 Z" fill="#ff7eb3" opacity="0.9" />
-                    <circle cx="100" cy="80" r="30" fill="#d63447" />
-                    <circle cx="100" cy="80" r="22" fill="#ff2e63" />
-                    <circle cx="65" cy="100" r="25" fill="#e84545" />
-                    <circle cx="135" cy="100" r="25" fill="#e84545" />
-                    <circle cx="75" cy="60" r="22" fill="#ff2e63" />
-                    <circle cx="125" cy="60" r="22" fill="#ff2e63" />
-                </svg>
-                <div class="progress-ring-container">
-                    <svg width="300" height="300">
-                        <circle class="progress-ring__circle" stroke="#f7d070" stroke-width="6" fill="transparent" r="130" cx="150" cy="150"/>
-                    </svg>
-                </div>
-                <div class="hold-instruction">
-                    <i class="fa-solid fa-hand-pointer"></i> Chạm để bắn ảnh hoặc <b>Ấn & Giữ</b> để tiếp tục
+        </main>
+
+        <!-- Action Controls & Progress Bar -->
+        <footer class="mt-8 flex flex-col items-center gap-4 w-full z-10">
+            
+            <!-- Progress Counter -->
+            <div class="flex items-center gap-3 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-pink-100 shadow-sm text-xs font-medium text-gray-600">
+                <span>Tiến trình: <strong id="progressText" class="text-rose-600 font-bold">1 / 12</strong></span>
+                <div class="w-24 bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-rose-500 h-full w-0 transition-all duration-500"></div>
                 </div>
             </div>
-        </section>
 
-        <!-- SCREEN 3 -->
-        <section class="screen" id="screen3">
-            <div class="waterfall-container" id="waterfallContainer"></div>
-        </section>
+            <!-- Main Interactive Button -->
+            <button id="btnNext" class="py-3.5 px-8 rounded-full font-semibold text-white text-base btn-glow flex items-center gap-2.5 shadow-lg">
+                <span id="btnText">Tiếp Theo</span>
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+            </button>
+
+        </footer>
+
     </div>
 
-    <!-- MODAL CONFIG -->
-    <div class="modal-overlay" id="configModal">
-        <div class="modal-body">
-            <h3>Cá Nhân Hóa Món Quà</h3>
-            <div class="form-group">
-                <label>Lời chào mở đầu:</label>
-                <input type="text" id="inputIntroMsg" value="Gửi Bạn xuu - bông hoa đẹp nhất ❤️">
-            </div>
-            <div class="form-group">
-                <label>Ngày bắt đầu (VD: 2024-01-01):</label>
-                <input type="date" id="inputStartDate" value="2024-01-01">
-            </div>
-            <div class="form-group">
-                <label>Link nhạc nền (.mp3):</label>
-                <input type="text" id="inputMusicUrl" value="https://www.bensound.com/bensound-music/bensound-tenderness.mp3">
-            </div>
-            <div class="modal-btns">
-                <button class="btn-modal btn-save" id="saveConfigBtn">Áp Dụng</button>
-                <button class="btn-modal btn-close" id="closeModalBtn">Đóng</button>
-            </div>
-        </div>
-    </div>
 
-    <div class="toast" id="toastMessage">Đã lưu cấu hình thành công!</div>
-
+    <!-- JavaScript Logic -->
     <script>
-        const DEFAULT_CONFIG = {
-            introMessage: "Gửi Bạn xuu - bông hoa đẹp nhất ❤️",
-            startDate: "2024-01-01T00:00:00",
-            musicUrl: "https://www.bensound.com/bensound-music/bensound-tenderness.mp3",
-            avatarUrl: "images/anh4.jpg",
-            memories: [
-                { img: "images/anh1.jpg", text: "20 tháng 10 Khoa chúc xuu một ngày tràn ngập niềm vui vô lo vô nghĩ!", date: "20/10/2026" },
-                { img: "images/anh2.jpg", text: "Chúc xuu luôn xinh đẹp rạng rỡ như những ánh nắng ban mai.", date: "Mỗi ngày" },
-                { img: "images/anh3.jpg", text: "Và mong những điều tốt sẽ tìm đến bạn,hôm nay,ngày mai và cả những ngày sau nữa. Thương, Khoa đẹp zoai", date: "Luôn luôn" }
-            ]
-        };
+        // ------------------------------------------------------------------
+        // 1. DATA MODEL: 12 Distinct Greeting Cards
+        // ------------------------------------------------------------------
+        const cardsData = [
+            {
+                id: 1,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 2,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+               id: 3,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 4,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 5,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 6,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 7,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 8,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+               id: 9,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 10,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+               id: 11,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            },
+            {
+                id: 12,
+                role: "...",
+                title: "...",
+                wish: "...",
+                desc: "...",
+                image: "anh"
+            }
+        ];
 
-        let config = { ...DEFAULT_CONFIG };
+        // State variables
+        let availableIds = [];
+        let isAnimating = false;
 
-        // Canvas Particles
-        const canvas = document.getElementById('bgCanvas');
+        // ------------------------------------------------------------------
+        // 2. DOM ELEMENTS
+        // ------------------------------------------------------------------
+        const cardWrapper = document.getElementById('cardWrapper');
+        const cardRole = document.getElementById('cardRole');
+        const cardTitle = document.getElementById('cardTitle');
+        const cardWish = document.getElementById('cardWish');
+        const cardDesc = document.getElementById('cardDesc');
+        const cardImage = document.getElementById('cardImage');
+
+        const btnNext = document.getElementById('btnNext');
+        const btnText = document.getElementById('btnText');
+        const btnReset = document.getElementById('btnReset');
+        const completionBox = document.getElementById('completionBox');
+
+        const progressText = document.getElementById('progressText');
+        const progressBar = document.getElementById('progressBar');
+        const scatterOverlay = document.getElementById('scatterOverlay');
+
+        // ------------------------------------------------------------------
+        // 3. CANVAS PETALS & SPARKLES ANIMATION
+        // ------------------------------------------------------------------
+        const canvas = document.getElementById('petalCanvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
 
-        class Particle {
-            constructor() { this.reset(); }
+        class Petal {
+            constructor() {
+                this.reset();
+            }
+
             reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height + Math.random() * 20;
+                this.x = Math.random() * width;
+                this.y = Math.random() * -height;
                 this.size = Math.random() * 10 + 6;
-                this.speedY = Math.random() * 1.2 + 0.4;
+                this.speedY = Math.random() * 1.2 + 0.6;
                 this.speedX = Math.random() * 0.8 - 0.4;
-                this.opacity = Math.random() * 0.7 + 0.3;
-                this.rotation = Math.random() * Math.PI * 2;
-                this.rotSpeed = (Math.random() - 0.5) * 0.02;
-                this.color = ['#ff758c', '#ff7eb3', '#d63447', '#f7d070'][Math.floor(Math.random() * 4)];
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = (Math.random() - 0.5) * 1.5;
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.color = Math.random() > 0.3 ? '#ffccd5' : '#ff4d6d';
             }
+
             update() {
-                this.y -= this.speedY;
+                this.y += this.speedY;
                 this.x += Math.sin(this.y * 0.01) + this.speedX;
-                this.rotation += this.rotSpeed;
-                if (this.y < -30) this.reset();
+                this.rotation += this.rotationSpeed;
+
+                if (this.y > height + 20) {
+                    this.reset();
+                }
             }
+
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation);
+                ctx.rotate((this.rotation * Math.PI) / 180);
                 ctx.globalAlpha = this.opacity;
                 ctx.fillStyle = this.color;
+
                 ctx.beginPath();
-                ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-this.size / 2, -this.size / 2, -this.size, this.size / 3, 0, this.size);
+                ctx.bezierCurveTo(this.size, this.size / 3, this.size / 2, -this.size / 2, 0, 0);
                 ctx.fill();
                 ctx.restore();
             }
         }
 
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < 40; i++) particles.push(new Particle());
+        const petals = Array.from({ length: 30 }, () => new Petal());
+
+        function animatePetals() {
+            ctx.clearRect(0, 0, width, height);
+            petals.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animatePetals);
+        }
+        animatePetals();
+
+        // ------------------------------------------------------------------
+        // 4. RANDOM & SCATTER ANIMATION LOGIC
+        // ------------------------------------------------------------------
+        function initApp() {
+            availableIds = cardsData.map(c => c.id);
+            completionBox.classList.add('hidden');
+            btnNext.disabled = false;
+            btnNext.style.opacity = '1';
+            btnText.textContent = "Xem Danh Thiếp Tiếp Theo";
+            showNextCard();
         }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
+        function triggerScatterAnimation(callback) {
+            scatterOverlay.style.display = 'block';
+            scatterOverlay.innerHTML = '';
+
+            const proxyCount = 12;
+            const proxies = [];
+
+            for (let i = 0; i < proxyCount; i++) {
+                const proxy = document.createElement('div');
+                proxy.className = 'mini-card-proxy';
+
+                const randomCard = cardsData[Math.floor(Math.random() * cardsData.length)];
+                proxy.style.backgroundImage = `url('${randomCard.image}')`;
+
+                const startX = window.innerWidth / 2 - 55;
+                const startY = window.innerHeight / 2 - 75;
+
+                proxy.style.left = `${startX}px`;
+                proxy.style.top = `${startY}px`;
+
+                scatterOverlay.appendChild(proxy);
+                proxies.push(proxy);
+            }
+
+            const startTime = performance.now();
+            const duration = 1400; // 1.4 seconds
+
+            function animateProxies(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                proxies.forEach((p, idx) => {
+                    const angle = (idx / proxyCount) * Math.PI * 2 + progress * 6;
+                    const radius = (1 - Math.pow(progress - 1, 2)) * (Math.min(window.innerWidth, window.innerHeight) * 0.35);
+
+                    const x = (window.innerWidth / 2 - 55) + Math.cos(angle) * radius * (1 + Math.sin(idx));
+                    const y = (window.innerHeight / 2 - 75) + Math.sin(angle) * radius * (1 + Math.cos(idx));
+                    const rot = progress * 540 + idx * 30;
+                    const scale = 0.6 + Math.sin(progress * Math.PI + idx) * 0.4;
+
+                    p.style.transform = `translate3d(${x - (window.innerWidth / 2 - 55)}px, ${y - (window.innerHeight / 2 - 75)}px, 0) rotate(${rot}deg) scale(${scale})`;
+                    p.style.opacity = (1 - progress * 0.9).toString();
+                });
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateProxies);
+                } else {
+                    scatterOverlay.style.display = 'none';
+                    scatterOverlay.innerHTML = '';
+                    if (callback) callback();
+                }
+            }
+
+            requestAnimationFrame(animateProxies);
         }
-        initParticles();
-        animateParticles();
 
-        // Audio & Screen Switching
-        const audio = document.getElementById('bgMusic');
-        const musicBtn = document.getElementById('musicBtn');
-        const musicDisc = document.getElementById('musicDisc');
-        const musicStatus = document.getElementById('musicStatus');
-        let isPlaying = false;
-
-        function toggleAudio() {
-            if (isPlaying) {
-                audio.pause();
-                musicDisc.classList.remove('playing');
-                musicStatus.innerText = "Tắt Nhạc";
-                isPlaying = false;
-            } else {
-                audio.src = config.musicUrl;
-                audio.play().then(() => {
-                    musicDisc.classList.add('playing');
-                    musicStatus.innerText = "Đang Phát";
-                    isPlaying = true;
-                }).catch(e => console.log(e));
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 50,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ff4d6d', '#c9184a', '#d4af37', '#ffffff']
+                });
             }
         }
-        musicBtn.addEventListener('click', toggleAudio);
 
-        function switchScreen(fromId, toId) {
-            document.getElementById(fromId).classList.remove('active');
-            document.getElementById(toId).classList.add('active');
+        function updateCardUI(card) {
+            cardRole.textContent = card.role;
+            cardTitle.textContent = card.title;
+            cardWish.textContent = `"${card.wish}"`;
+            cardDesc.textContent = card.desc;
+            cardImage.src = card.image;
+
+            cardWrapper.classList.remove('hidden', 'animate-card-bounce');
+            void cardWrapper.offsetWidth;
+            cardWrapper.classList.add('animate-card-bounce');
+
+            const total = cardsData.length;
+            const viewedCount = total - availableIds.length;
+            progressText.textContent = `${viewedCount} / ${total}`;
+            progressBar.style.width = `${(viewedCount / total) * 100}%`;
         }
 
-        // Typing Effect
-        function startTypingEffect(text) {
-            const container = document.getElementById('typingText');
-            container.innerHTML = "";
-            let i = 0;
-            const timer = setInterval(() => {
-                if (i < text.length) {
-                    container.innerHTML += text.charAt(i);
-                    i++;
-                } else {
-                    clearInterval(timer);
-                }
-            }, 60);
-        }
-        startTypingEffect(config.introMessage);
+        function showNextCard() {
+            if (isAnimating) return;
 
-        document.getElementById('startBtn').addEventListener('click', () => {
-            if (!isPlaying) toggleAudio();
-            switchScreen('screen1', 'screen2');
-        });
+            if (availableIds.length === 0) {
+                cardWrapper.classList.add('hidden');
+                completionBox.classList.remove('hidden');
+                btnNext.disabled = true;
+                btnNext.style.opacity = '0.5';
+                btnText.textContent = "Đã Xem Hết Thiếp";
+                return;
+            }
 
-        // Bouquet Interactions
-        const bouquetContainer = document.getElementById('bouquetContainer');
-        const progressCircle = document.querySelector('.progress-ring__circle');
-        const circumference = 2 * Math.PI * 130;
-        let holdTimer = null;
-        let holdProgress = 0;
-        let photoIndex = 0;
+            isAnimating = true;
 
-        function triggerPhotoPopup(x, y) {
-            const popup = document.createElement('div');
-            popup.className = 'popup-photo';
-            const photoUrl = config.memories[photoIndex % config.memories.length].img;
-            photoIndex++;
-            popup.innerHTML = `<img src="${photoUrl}" alt="Kỷ niệm">`;
-            popup.style.setProperty('--rot', (Math.random() * 30 - 15) + 'deg');
-            popup.style.left = `${x}px`;
-            popup.style.top = `${y}px`;
-            document.body.appendChild(popup);
-            setTimeout(() => popup.remove(), 1800);
-        }
+            if (availableIds.length === cardsData.length) {
+                const randomIndex = Math.floor(Math.random() * availableIds.length);
+                const chosenId = availableIds.splice(randomIndex, 1)[0];
+                const card = cardsData.find(c => c.id === chosenId);
 
-        function setProgress(percent) {
-            progressCircle.style.strokeDashoffset = circumference - (percent / 100) * circumference;
+                updateCardUI(card);
+                triggerConfetti();
+                isAnimating = false;
+            } else {
+                cardWrapper.classList.add('hidden');
+
+                triggerScatterAnimation(() => {
+                    const randomIndex = Math.floor(Math.random() * availableIds.length);
+                    const chosenId = availableIds.splice(randomIndex, 1)[0];
+                    const card = cardsData.find(c => c.id === chosenId);
+
+                    updateCardUI(card);
+                    triggerConfetti();
+                    isAnimating = false;
+
+                    if (availableIds.length === 0) {
+                        btnText.textContent = "Xem Thiếp Cuối Cùng";
+                    } else {
+                        btnText.textContent = "Xem Danh Thiếp Tiếp Theo";
+                    }
+                });
+            }
         }
 
-        function startHold(e) {
-            holdProgress = 0;
-            const touch = e.touches ? e.touches[0] : e;
-            triggerPhotoPopup(touch.clientX, touch.clientY);
+        // ------------------------------------------------------------------
+        // 5. EVENT LISTENERS
+        // ------------------------------------------------------------------
+        btnNext.addEventListener('click', showNextCard);
+        btnReset.addEventListener('click', initApp);
 
-            clearInterval(holdTimer);
-            holdTimer = setInterval(() => {
-                holdProgress += 5;
-                setProgress(holdProgress);
-                if (holdProgress >= 100) {
-                    clearInterval(holdTimer);
-                    switchScreen('screen2', 'screen3');
-                    initScreen3();
-                }
-            }, 50);
-        }
-
-        function endHold() {
-            clearInterval(holdTimer);
-            holdProgress = 0;
-            setProgress(0);
-        }
-
-        bouquetContainer.addEventListener('mousedown', startHold);
-        bouquetContainer.addEventListener('mouseup', endHold);
-        bouquetContainer.addEventListener('mouseleave', endHold);
-        bouquetContainer.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(e); });
-        bouquetContainer.addEventListener('touchend', endHold);
-
-        // Screen 3 Initialization
-        function initScreen3() {
-            // Love Counter Timer
-            setInterval(() => {
-                const start = new Date(config.startDate);
-                const now = new Date();
-                const diff = now - start;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                const mins = Math.floor((diff / 1000 / 60) % 60);
-                const secs = Math.floor((diff / 1000) % 60);
-
-                document.getElementById('daysCount').innerText = days >= 0 ? days : 0;
-                document.getElementById('hoursCount').innerText = hours;
-                document.getElementById('minsCount').innerText = mins;
-                document.getElementById('secsCount').innerText = secs;
-            }, 1000);
-
-            // Populate Waterfall Memories
-            const container = document.getElementById('waterfallContainer');
-            container.innerHTML = "";
-            config.memories.forEach((mem, index) => {
-                const card = document.createElement('div');
-                card.className = 'memory-card';
-                card.innerHTML = `
-                    <img src="${mem.img}" alt="Memory">
-                    <p>${mem.text}</p>
-                    <div class="card-date">${mem.date}</div>
-                `;
-                container.appendChild(card);
-                setTimeout(() => card.classList.add('visible'), 300 * (index + 1));
-            });
-        }
-
-        // Modal Config Logic
-        const modal = document.getElementById('configModal');
-        document.getElementById('openConfigBtn').addEventListener('click', () => modal.classList.add('active'));
-        document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.remove('active'));
-
-        document.getElementById('saveConfigBtn').addEventListener('click', () => {
-            config.introMessage = document.getElementById('inputIntroMsg').value;
-            config.startDate = document.getElementById('inputStartDate').value;
-            config.musicUrl = document.getElementById('inputMusicUrl').value;
-            
-            startTypingEffect(config.introMessage);
-            modal.classList.remove('active');
-            
-            const toast = document.getElementById('toastMessage');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
-        });
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
